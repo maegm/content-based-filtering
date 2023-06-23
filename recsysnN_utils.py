@@ -1,38 +1,60 @@
-import pickle5 as pickle
 import numpy as np
-from numpy import genfromtxt
+import pandas as pd
+import requests
+from io import BytesIO
+import joblib
 from collections import defaultdict
-import csv
 import tabulate
 
 
 def load_data():
-    item_train = genfromtxt('./data/content_item_train.csv', delimiter=',')
-    user_train = genfromtxt('./data/content_user_train.csv', delimiter=',')
-    y_train = genfromtxt('./data/content_y_train.csv', delimiter=',')
-    with open('./data/content_item_train_header.txt', newline='') as f:  # csv reader handles quoted strings better
-        item_features = list(csv.reader(f))[0]
-    with open('./data/content_user_train_header.txt', newline='') as f:
-        user_features = list(csv.reader(f))[0]
-    item_vecs = genfromtxt('./data/content_item_vecs.csv', delimiter=',')
 
-    movie_dict = defaultdict(dict)
-    count = 0
-    #    with open('./data/movies.csv', newline='') as csvfile:
-    with open('./data/content_movie_list.csv', newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',', quotechar='"')
-        for line in reader:
-            if count == 0:
-                count += 1  # skip header
-                # print(line)
-            else:
-                count += 1
-                movie_id = int(line[0])
-                movie_dict[movie_id]["title"] = line[1]
-                movie_dict[movie_id]["genres"] = line[2]
+    url_item_tr = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_train.csv'
+    item_train = (
+        pd.read_csv(url_item_tr, header=None)
+        .to_numpy()
+    )
 
-    with open('./data/content_user_to_genre.pickle', 'rb') as f:
-        user_to_genre = pickle.load(f)
+    url_user_tr = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_user_train.csv'
+    user_train = (
+        pd.read_csv(url_user_tr, header=None)
+        .to_numpy()
+    )
+
+    url_y_train = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_y_train.csv'
+    y_train = (
+        pd.read_csv(url_y_train, header=None)
+        .to_numpy()
+    )
+
+    url_item_feat = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_train_header.txt'
+    item_features = (
+        pd.read_csv(url_item_feat, header=None)
+        .to_numpy()
+    )
+
+    url_user_feat = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_user_train_header.txt'
+    user_features = (
+        pd.read_csv(url_user_feat, header=None)
+        .to_numpy()
+    )
+
+    url_item_vecs = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_vecs.csv'
+    item_vecs = (
+        pd.read_csv(url_item_vecs, header=None)
+        .to_numpy()
+    )
+
+    url_movies = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_movie_list.csv'
+    movie_dict = (
+        pd.read_csv(url_movies)
+        .set_index('movieId')
+        .to_dict('index')
+    )
+
+    url_gnr = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_user_to_genre.pickle'
+    r = requests.get(url_gnr)
+    user_to_genre = joblib.load(BytesIO(r.content))
 
     return item_train, user_train, y_train, item_features, user_features, item_vecs, movie_dict, user_to_genre
 
