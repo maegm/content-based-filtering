@@ -5,27 +5,20 @@ from io import BytesIO
 import joblib
 from collections import defaultdict
 import tabulate
+from numpy import genfromtxt
 
 
 def load_data():
 
     url_item_tr = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_train.csv'
-    item_train = (
-        pd.read_csv(url_item_tr, header=None)
-        .to_numpy()
-    )
+    item_train =  pd.read_csv(url_item_tr, header=None).to_numpy()
 
     url_user_tr = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_user_train.csv'
-    user_train = (
-        pd.read_csv(url_user_tr, header=None)
-        .to_numpy()
-    )
+    user_train = pd.read_csv(url_user_tr, header=None).to_numpy()
 
     url_y_train = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_y_train.csv'
-    y_train = (
-        pd.read_csv(url_y_train, header=None)
-        .to_numpy()
-    )
+    y_train = pd.read_csv(url_y_train, header=None).to_numpy()
+    y_train = y_train.reshape((len(y_train),))
 
     url_item_feat = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_train_header.txt'
     item_features = pd.read_csv(url_item_feat, header=None).T[0].to_list()
@@ -34,10 +27,7 @@ def load_data():
     user_features = pd.read_csv(url_user_feat, header=None).T[0].to_list()
 
     url_item_vecs = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_vecs.csv'
-    item_vecs = (
-        pd.read_csv(url_item_vecs, header=None)
-        .to_numpy()
-    )
+    item_vecs = pd.read_csv(url_item_vecs, header=None).to_numpy()
 
     url_movies = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_movie_list.csv'
     movie_dict = (
