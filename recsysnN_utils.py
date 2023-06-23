@@ -28,16 +28,10 @@ def load_data():
     )
 
     url_item_feat = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_train_header.txt'
-    item_features = (
-        pd.read_csv(url_item_feat, header=None)
-        .to_numpy()
-    )
+    item_features = pd.read_csv(url_item_feat, header=None).T[0].to_list()
 
     url_user_feat = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_user_train_header.txt'
-    user_features = (
-        pd.read_csv(url_user_feat, header=None)
-        .to_numpy()
-    )
+    user_features = pd.read_csv(url_user_feat, header=None).T[0].to_list()
 
     url_item_vecs = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_vecs.csv'
     item_vecs = (
