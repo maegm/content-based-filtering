@@ -5,13 +5,12 @@ from io import BytesIO
 import joblib
 from collections import defaultdict
 import tabulate
-from numpy import genfromtxt
 
 
 def load_data():
 
     url_item_tr = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_item_train.csv'
-    item_train =  pd.read_csv(url_item_tr, header=None).to_numpy()
+    item_train = pd.read_csv(url_item_tr, header=None).to_numpy()
 
     url_user_tr = 'https://raw.githubusercontent.com/maegm/content-based-filtering/master/data/content_user_train.csv'
     user_train = pd.read_csv(url_user_tr, header=None).to_numpy()
@@ -43,36 +42,10 @@ def load_data():
     return item_train, user_train, y_train, item_features, user_features, item_vecs, movie_dict, user_to_genre
 
 
-def pprint_train(x_train, features, vs, u_s, maxcount=5, user=True):
+def pprint_train(x_train, features, maxcount=5):
     """ Prints user_train or item_train nicely """
-    if user:
-        flist = [".0f", ".0f", ".1f",
-                 ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f", ".1f"]
-    else:
-        flist = [".0f", ".0f", ".1f",
-                 ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f", ".0f"]
-
-    head = features[:vs]
-    if vs < u_s:
-        print("error, vector start {vs} should be greater then user start {u_s}")
-    for i in range(u_s):
-        head[i] = "[" + head[i] + "]"
-    genres = features[vs:]
-    hdr = head + genres
-    disp = [split_str(hdr, 5)]
-    count = 0
-    for i in range(0, x_train.shape[0]):
-        if count == maxcount:
-            break
-        count += 1
-        disp.append([
-            x_train[i, 0].astype(int),
-            x_train[i, 1].astype(int),
-            x_train[i, 2].astype(float),
-            *x_train[i, 3:].astype(float)
-        ])
-    table = tabulate.tabulate(disp, tablefmt='html', headers="firstrow", floatfmt=flist, numalign='center')
-    return table
+    df = pd.DataFrame(x_train, columns=features).head(maxcount)
+    return df
 
 
 def split_str(ifeatures, smax):
@@ -150,7 +123,7 @@ def get_user_vecs(user_id, user_train, item_vecs, user_to_genre):
 
     if user_id not in user_to_genre:
         print("error: unknown user id")
-        return (None)
+        return None
     else:
         user_vec_found = False
         for i in range(len(user_train)):
